@@ -76,6 +76,7 @@ sub run_tests {
         $cookie_jar ? (cookies => $cookie_jar) : (),
         action  => 'test',
         method  => 'form',
+        arg     => {},
         cv      => $cv,
         cb      => sub {
             my $data = shift;
@@ -90,7 +91,7 @@ sub run_tests {
         cb => sub {
             my $event = shift;
 
-            is_deep $event, $expected_event, "Poll handler with $desc";
+            is_deep $event, [$expected_event], "Poll handler with $desc";
         },
     );
 

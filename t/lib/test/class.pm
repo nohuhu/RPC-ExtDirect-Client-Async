@@ -12,13 +12,15 @@ sub ordered : ExtDirect(3) {
 }
 
 sub named : ExtDirect(params => ['arg1', 'arg2', 'arg3']) {
-    my ($class, %params) = @_;
+    my ($class, %arg) = @_;
 
-    return {
-        arg1 => $params{arg1},
-        arg2 => $params{arg2},
-        arg3 => $params{arg3},
-    };
+    return { %arg };
+}
+
+sub named_no_strict : ExtDirect(params => ['arg1', 'arg2'], strict => !1) {
+    my ($class, %arg) = @_;
+
+    return { %arg };
 }
 
 sub handle_form : ExtDirect(formHandler) {
