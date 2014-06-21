@@ -15,6 +15,10 @@ use RPC::ExtDirect::Server::Util;
 
 use lib 't/lib';
 use test::class;
+use RPC::ExtDirect::Client::Async::Test::Util;
+
+# Clean up %ENV so that AnyEvent::HTTP does not accidentally connect to a proxy
+clean_env;
 
 my ($host, $port) = maybe_start_server(static_dir => 't/htdocs');
 ok $port, "Got host: $host and port: $port";
