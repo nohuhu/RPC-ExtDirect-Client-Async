@@ -71,8 +71,10 @@ eval {
         arg    => [],
         cb     => sub {
             my $have = shift;
-
-            is_deep $have, \1, "Call data matches";
+            my $want = JSON::true;
+            
+            cmp_ok $have, '==', $want, "Call data matches"
+                or diag explain "Have:", $have, "Want:", $want;
         },
     )
 };
