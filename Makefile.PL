@@ -21,37 +21,57 @@ disttest : distdir
 END
 }
 
-my $mm_version = $ExtUtils::MakeMaker::VERSION;
+my $MM_VERSION = $ExtUtils::MakeMaker::VERSION;
+my $github_uri = 'https://github.com/nohuhu/RPC-ExtDirect-Client-Async';
 
 WriteMakefile(
     NAME              => 'RPC::ExtDirect::Client::Async',
     VERSION_FROM      => 'lib/RPC/ExtDirect/Client/Async.pm',
-    ($mm_version >= 6.55
-        ? ( BUILD_REQUIRES => {
-                'RPC::ExtDirect::Server' => '1.00',
+    
+    ($MM_VERSION >= 6.64
+        ? ( TEST_REQUIRES => {
+                'Test::More'             => '0.82', # for explain()
+                'RPC::ExtDirect::Server' => '1.01',
             },
             PREREQ_PM => {
-                'AnyEvent::HTTP'         => '2.0',
-                'RPC::ExtDirect::Client' => '1.00',
+                'AnyEvent::HTTP'         => '2.00',
+                'RPC::ExtDirect::Client' => '1.03',
             },
         )
-        : ( PREREQ_PM => {
-                'AnyEvent::HTTP'         => '2.0',
-                'RPC::ExtDirect::Server' => '1.00',
-                'RPC::ExtDirect::Client' => '1.00',
-            },
-        )
+        : ($MM_VERSION >= 6.5503
+            ? ( BUILD_REQUIRES => {
+                    'Test::More'             => '0.82',
+                    'RPC::ExtDirect::Server' => '1.01',
+                },
+                PREREQ_PM => {
+                    'AnyEvent::HTTP'         => '2.00',
+                    'RPC::ExtDirect::Client' => '1.03',
+                },
+            )
+            : ( PREREQ_PM => {
+                    'AnyEvent::HTTP'         => '2.00',
+                    'RPC::ExtDirect::Server' => '1.01',
+                    'RPC::ExtDirect::Client' => '1.03',
+                    'Test::More'             => '0.82',
+                },
+            )
+        ),
     ),
 
     ABSTRACT => 'Asynchronous Ext.Direct client in Perl',
     AUTHOR   => 'Alex Tokarev <tokarev@cpan.org>',
     LICENSE  => 'perl',
 
-    ($mm_version >= 6.46
+    ($MM_VERSION >= 6.48
+        ? ( MIN_PERL_VERSION => 5.008000 )
+        : ()
+    ),
+
+    ($MM_VERSION >= 6.46
         ? ( META_MERGE => {
                 resources => {
-                    bugtracker => 'http://github.com/nohuhu/RPC-ExtDirect-Client-Async/issues',
-                    repository => 'http://github.com/nohuhu/RPC-ExtDirect-Client-Async',
+                    bugtracker => "$github_uri/issues",
+                    repository => $github_uri,
                 },
             },
         )
