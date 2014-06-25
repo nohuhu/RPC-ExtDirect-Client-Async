@@ -31,25 +31,6 @@ croak __PACKAGE__." requires RPC::ExtDirect 3.0+"
 
 our $VERSION = '1.00';
 
-### PUBLIC CLASS METHOD (CONSTRUCTOR) ###
-#
-# Instantiate a new Async client, connect to the specified server
-# and initialize the Ext.Direct API. Optionally fire a callback
-# when that's done (if provided).
-#
-
-sub new {
-    my ($class, %params) = @_;
-    
-    my $api_cb = delete $params{api_cb};
-    
-    my $self = $class->SUPER::new(%params);
-    
-    $self->api_cb($api_cb);
-    
-    return $self;
-}
-
 ### PUBLIC INSTANCE METHOD ###
 #
 # Call specified Action's Method asynchronously
@@ -130,7 +111,7 @@ sub transaction_class { 'RPC::ExtDirect::Client::Async::Transaction' }
 #
 
 RPC::ExtDirect::Util::Accessor->mk_accessor(
-    simple => [qw/ api_ready api_cb exception request_queue /],
+    simple => [qw/ api_ready exception request_queue /],
 );
 
 ############## PRIVATE METHODS BELOW ##############
@@ -141,35 +122,55 @@ RPC::ExtDirect::Util::Accessor->mk_accessor(
 #
 
 sub _init_api {
-    my ($self) = @_;
+    my ($self, $api) = @_;
     
-    # We want to be truly asynchronous, so instead of blocking
-    # on API retrieval, we create a request queue and return immediately.
-    # If any call/form/poll requests happen before we've got the API
-    # result back, we push them in the queue and wait for the API
-    # to arrive, then re-run the requests.
-    # After the API declaration has been retrieved, all subsequent
-    # requests run without queuing.
-    $self->request_queue([]);
+    # If we're passed a local API instance, init immediately
+    # and don't bother with request queue - we won't need it anyway.
+    if ($api) {
+        my $cv     = $self->cv;
+        my $api_cb = $self->api_cb;
+        
+        $cv->begin if $cv;
+        
+        $self->_assign_api($api);
+        $self->api_ready(1);
+        
+        $api_cb->($self, 1) if $api_cb;
+        
+        $cv->end if $cv;
+    }
+    else {
+    
+        # We want to be truly asynchronous, so instead of blocking
+        # on API retrieval, we create a request queue and return
+        # immediately. If any call/form/poll requests happen before
+        # we've got the API result back, we push them in the queue
+        # and wait for the API to arrive, then re-run the requests.
+        # After the API declaration has been retrieved, all subsequent
+        # requests run without queuing.
+        $self->request_queue([]);
 
-    $self->_get_api(sub {
-        my ($success, $api_js, $error) = @_;
+        $self->_get_api(sub {
+            my ($success, $api_js, $error) = @_;
         
-        if ( $success ) {
-            $self->_import_api($api_js);
-            $self->api_ready(1);
-        }
-        else {
-            $self->exception($error);
-        }
+            if ( $success ) {
+                $self->_import_api($api_js);
+                $self->api_ready(1);
+            }
+            else {
+                $self->exception($error);
+            }
         
-        $self->api_cb->($self, $success, $error) if $self->api_cb;
+            $self->api_cb->($self, $success, $error) if $self->api_cb;
         
-        my $queue = $self->request_queue;
-        delete $self->{request_queue};  # A bit quirky
+            my $queue = $self->request_queue;
+            delete $self->{request_queue};  # A bit quirky
     
-        $_->($success, $error) for @$queue;
-    });
+            $_->($success, $error) for @$queue;
+        });
+    }
+    
+    return 1;
 }
 
 ### PRIVATE INSTANCE METHOD ###
@@ -413,8 +414,11 @@ my @fields = qw/ cb cv actual_arg fields /;
 sub new {
     my ($class, %params) = @_;
     
+    my $cb = $params{cb};
+    
     die ["Callback subroutine is required"]
-        unless 'CODE' eq ref $params{cb};
+        if 'CODE' ne ref $cb && !($cb && $cb->isa('AnyEvent::CondVar'));
+                
     
     my %self_params = map { $_ => delete $params{$_} } @fields;
     

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 101;
+use Test::More tests => 104;
 
 use AnyEvent;
 use AnyEvent::HTTP;
@@ -63,6 +63,31 @@ eval {
 
 like $@, qr{^Callback subroutine is required},
          "Died at no callback provided after ready";
+
+# This should treat the cv as callback and pass the error on to it
+my $cv2 = AnyEvent->condvar;
+
+eval {
+    $client->call_async(
+        action => 'test',
+        method => 'nonexistent',
+        arg    => [],
+        cb     => $cv2,
+    )
+};
+
+is $@, '', "CV as callback eval $@";
+
+my $want = [
+    undef, '', 'Method nonexistent is not found in Action test'
+];
+
+# Block, but briefly
+my $have = $cv2->recv;
+my @have = $cv2->recv;
+
+is       $have, undef, "CV as callback result scalar context";
+is_deep \@have, $want, "CV as callback result list context";
 
 # These calls should behave the same way as before API is ready,
 # i.e. not die but pass the error to the callback

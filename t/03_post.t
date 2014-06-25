@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 use AnyEvent;
 use AnyEvent::HTTP;
@@ -79,6 +79,21 @@ $client->call_async(
     },
 );
 
-# Block until all tests finish
+# Block until all tests above finish
 $cv->recv;
+
+# Test cv as the callback
+$cv = AnyEvent->condvar;
+
+$client->call_async(
+    action => 'test',
+    method => 'ordered',
+    arg    => [41, 42, 43],
+    cb     => $cv,
+);
+
+# This should block
+my $have = $cv->recv;
+
+is_deep $have, [41, 42, 43], "cv as callback data matches";
 

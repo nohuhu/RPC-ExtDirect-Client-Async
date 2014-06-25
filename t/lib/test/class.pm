@@ -5,6 +5,8 @@ use strict;
 use RPC::ExtDirect Action => 'test';
 use RPC::ExtDirect::Event;
 
+sub ping : ExtDirect(0) { \1 }
+
 sub ordered : ExtDirect(3) {
     my $class = shift;
 
