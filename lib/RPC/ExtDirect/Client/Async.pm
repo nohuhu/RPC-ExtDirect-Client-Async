@@ -2,11 +2,9 @@ package RPC::ExtDirect::Client::Async;
 
 use strict;
 use warnings;
-no  warnings 'uninitialized';
 
 use Carp;
 use File::Spec;
-use HTTP::Tiny;
 use AnyEvent::HTTP;
 
 use RPC::ExtDirect::Util::Accessor;
@@ -221,7 +219,7 @@ sub _get_api {
     # first one, if a condvar is used.
     #
     # I can surmise that it has something to do with AnyEvent::HTTP
-    # having procedural interface without clear way to separate
+    # having procedural interface without any clear way to separate
     # requests. Probably something within the (very tangled) bowels
     # of AnyEvent::HTTP::http_request is erroneously confusing condvars;
     # in any case, turning off permanent connections seem to cure that.
@@ -418,7 +416,6 @@ sub new {
     
     die ["Callback subroutine is required"]
         if 'CODE' ne ref $cb && !($cb && $cb->isa('AnyEvent::CondVar'));
-                
     
     my %self_params = map { $_ => delete $params{$_} } @fields;
     
