@@ -1,6 +1,7 @@
 package test::class;
 
 use strict;
+use warnings;
 
 use RPC::ExtDirect Action => 'test';
 use RPC::ExtDirect::Event;
@@ -9,8 +10,8 @@ sub ping : ExtDirect(0) { \1 }
 
 sub ordered : ExtDirect(3) {
     my $class = shift;
-
-    return [ splice @_, 0, 3 ];
+    
+    return [@_];
 }
 
 sub named : ExtDirect(params => ['arg1', 'arg2', 'arg3']) {
@@ -27,8 +28,6 @@ sub named_no_strict : ExtDirect(params => ['arg1', 'arg2'], strict => !1) {
 
 sub handle_form : ExtDirect(formHandler) {
     my ($class, %arg) = @_;
-
-    delete $arg{_env};
 
     my @fields = grep { !/^file_uploads/ } keys %arg;
 
@@ -50,6 +49,16 @@ sub handle_upload : ExtDirect(formHandler) {
     return \@result;
 }
 
+sub form : ExtDirect(formHandler) {
+    my $class = shift;
+    
+    return [@_];
+}
+
+sub dies : ExtDirect(0) {
+    die "Whoa there!\n";
+}
+
 our $EVENTS = [
     'foo',
     [ 'foo', 'bar' ],
@@ -63,4 +72,3 @@ sub handle_poll : ExtDirect(pollHandler) {
 }
 
 1;
-

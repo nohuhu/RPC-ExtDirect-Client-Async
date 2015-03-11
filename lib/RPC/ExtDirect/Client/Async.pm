@@ -403,8 +403,6 @@ sub _curry_response_cb {
 package
     RPC::ExtDirect::Client::Async::Transaction;
 
-use Carp;
-
 use base 'RPC::ExtDirect::Client::Transaction';
 
 my @fields = qw/ cb cv actual_arg fields /;
