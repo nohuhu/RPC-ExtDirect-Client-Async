@@ -20,11 +20,12 @@ RPC::ExtDirect::Client::Async - Asynchronous Ext.Direct client in Perl
     my $client = RPC::ExtDirect::Client::Async->new(host => 'localhost');
     
     $client->call_async(
-        action  => 'Action',
-        method  => 'Method',
-        arg     => [ 'foo', 'bar' ],
-        cookies => { foo => 'bar' },
-        cb      => sub {
+        action   => 'Action',
+        method   => 'Method',
+        arg      => [ 'foo', 'bar' ],
+        cookies  => { foo => 'bar' },
+        metadata => { baz => 'qux' },
+        cb       => sub {
             my ($result, $success, $error) = @_;
             
             if ( $success ) {
@@ -108,7 +109,7 @@ sub fired immediately with an error.
 
 In a cooperative multi-tasking environment such as L<AnyEvent> it is
 very hard, if at all possible, to guarantee that an exception thrown
-in a module code will be caught properly in the calling code. Because
+in the module code will be caught properly in the calling code. Because
 of that, Async client will not C<die> upon encountering errors, except
 when the error is fatal. Instead, the error will be passed to the
 callback:
@@ -279,6 +280,12 @@ parameters or hashref for named parameters. This parameter is mandatory
 even for Methods that accept no arguments; in such case, pass an empty
 arrayref.
 
+=item C<metadata>
+
+Ext.Direct Method metadata. Use arrayref for methods that accept ordered
+metadata, or hashref for named metadata. This parameter is always optional,
+as metadata itself is optional.
+
 =item C<cb>
 
 Mandatory callback function that will be fired when request finishes.
@@ -345,6 +352,11 @@ parameter is mandatory.
 
 A hashref of the Method arguments. This parameter is mandatory, unless
 L</upload> is specified.
+
+=item C<metadata>
+
+Metadata array- or hashref for this Method invocation. This parameter
+is always optional.
 
 =item C<upload>
 
@@ -551,7 +563,7 @@ issue fixed.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2013-2014 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+Copyright (c) 2013-2015 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>.
