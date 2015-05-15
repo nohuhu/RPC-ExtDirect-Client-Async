@@ -21,57 +21,55 @@ disttest : distdir
 END
 }
 
-my $MM_VERSION = $ExtUtils::MakeMaker::VERSION;
-my $github_uri = 'https://github.com/nohuhu/RPC-ExtDirect-Client-Async';
+my $MM_VERSION  = $ExtUtils::MakeMaker::VERSION;
+my $github_repo = 'https://github.com/nohuhu/RPC-ExtDirect-Client-Async';
+
+my %CORE_REQ = (
+    'AnyEvent::HTTP'         => '2.00',
+    'RPC::ExtDirect::Client' => '1.20',
+);
+
+my %TEST_REQ = (
+    'Test::More'             => '0.82', # for explain()
+    'CGI::ExtDirect'         => '3.21',
+    'RPC::ExtDirect::Server' => '1.20',
+);
 
 WriteMakefile(
-    NAME              => 'RPC::ExtDirect::Client::Async',
-    VERSION_FROM      => 'lib/RPC/ExtDirect/Client/Async.pm',
+    NAME         => 'RPC::ExtDirect::Client::Async',
+    VERSION_FROM => 'lib/RPC/ExtDirect/Client/Async.pm',
+    ABSTRACT     => 'Asynchronous Ext.Direct client in Perl',
+    AUTHOR       => 'Alex Tokarev <tokarev@cpan.org>',
+    LICENSE      => 'perl',
     
     ($MM_VERSION >= 6.64
-        ? ( TEST_REQUIRES => {
-                'Test::More'             => '0.82', # for explain()
-                'RPC::ExtDirect::Server' => '1.01',
-            },
-            PREREQ_PM => {
-                'AnyEvent::HTTP'         => '2.00',
-                'RPC::ExtDirect::Client' => '1.03',
-            },
+        ? (
+            TEST_REQUIRES => \%TEST_REQ,
+            PREREQ_PM     => \%CORE_REQ,
         )
-        : ($MM_VERSION >= 6.5503
-            ? ( BUILD_REQUIRES => {
-                    'Test::More'             => '0.82',
-                    'RPC::ExtDirect::Server' => '1.01',
-                },
-                PREREQ_PM => {
-                    'AnyEvent::HTTP'         => '2.00',
-                    'RPC::ExtDirect::Client' => '1.03',
-                },
-            )
-            : ( PREREQ_PM => {
-                    'AnyEvent::HTTP'         => '2.00',
-                    'RPC::ExtDirect::Server' => '1.01',
-                    'RPC::ExtDirect::Client' => '1.03',
-                    'Test::More'             => '0.82',
-                },
-            )
+        : (
+            ($MM_VERSION >= 6.5503
+                ? (
+                    BUILD_REQUIRES => \%TEST_REQ,
+                    PREREQ_PM      => \%CORE_REQ,
+                )
+                : (
+                    PREREQ_PM => {
+                        %TEST_REQ,
+                        %CORE_REQ,
+                    },
+                )
+            ),
         ),
     ),
-
-    ABSTRACT => 'Asynchronous Ext.Direct client in Perl',
-    AUTHOR   => 'Alex Tokarev <tokarev@cpan.org>',
-    LICENSE  => 'perl',
-
-    ($MM_VERSION >= 6.48
-        ? ( MIN_PERL_VERSION => 5.008000 )
-        : ()
-    ),
-
+    
+    ($MM_VERSION >= 6.48 ? ( MIN_PERL_VERSION => 5.008000 ) : ()),
+    
     ($MM_VERSION >= 6.46
         ? ( META_MERGE => {
                 resources => {
-                    bugtracker => "$github_uri/issues",
-                    repository => $github_uri,
+                    bugtracker => "$github_repo/issues",
+                    repository =>  $github_repo,
                 },
             },
         )

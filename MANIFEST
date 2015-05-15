@@ -7,7 +7,7 @@ README
 t/011_api_success.t
 t/012_api_errors.t
 t/013_api_local.t
-t/02_exceptions.t
+t/02_exception.t
 t/03_post.t
 t/04_form.t
 t/05_upload.t
