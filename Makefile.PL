@@ -26,13 +26,13 @@ my $github_repo = 'https://github.com/nohuhu/RPC-ExtDirect-Client-Async';
 
 my %CORE_REQ = (
     'AnyEvent::HTTP'         => '2.00',
-    'RPC::ExtDirect::Client' => '1.20',
+    'RPC::ExtDirect::Client' => '1.25',
 );
 
 my %TEST_REQ = (
     'Test::More'             => '0.82', # for explain()
-    'CGI::ExtDirect'         => '3.21',
-    'RPC::ExtDirect::Server' => '1.20',
+    'CGI::ExtDirect'         => '3.24',
+    'RPC::ExtDirect::Server' => '1.24',
 );
 
 WriteMakefile(
