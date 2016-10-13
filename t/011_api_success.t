@@ -41,18 +41,18 @@ my $client = eval {
 
             my $api = $self->get_api('remoting');
 
-            isa_ok $api, $apicls, "Remoting API";
+            ref_ok $api, $apicls, "Remoting API";
 
             $api = $self->get_api('polling');
 
-            isa_ok $api, $apicls, "Polling API";
+            ref_ok $api, $apicls, "Polling API";
         },
     )
 };
 
 is     $@,      '',      "Didn't die";
 ok     $client,          'Got client object';
-isa_ok $client, $cclass, 'Client';
+ref_ok $client, $cclass, 'Client';
 
 # Block until all tests finish
 $cv->recv;

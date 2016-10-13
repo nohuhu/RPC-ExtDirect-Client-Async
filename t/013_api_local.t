@@ -40,7 +40,7 @@ my $client = eval {
 
 is     $@,      '',      "Constructor eval $@";
 ok     $client,          "Got client object";
-isa_ok $client, $cclass, "Client";
+ref_ok $client, $cclass, "Client";
 
 ok $cv->ready, "cv signaled";
 is_deep $api_cb_run, [$client, 1], "api_cb run";
@@ -49,11 +49,11 @@ ok $client->api_ready, "API ready";
 
 my $remoting_api = $client->get_api('remoting');
 
-isa_ok $remoting_api, $aclass, "Remoting API object";
+ref_ok $remoting_api, $aclass, "Remoting API object";
 
 my $polling_api = $client->get_api('polling');
 
-isa_ok $polling_api, $aclass, "Polling API object";
+ref_ok $polling_api, $aclass, "Polling API object";
 
 # Finally start the server
 my ($host, $port) = maybe_start_server(static_dir => 't/htdocs');

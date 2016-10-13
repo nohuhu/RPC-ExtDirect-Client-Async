@@ -42,7 +42,7 @@ my $client = eval {
 
 is     $@,      '',      "Didn't die";
 ok     $client,          'Got client object';
-isa_ok $client, $cclass, 'Right object, too,';
+ref_ok $client, $cclass, 'Right object, too,';
 
 # maybe_start_server will leave arguments it doesn't know about
 my %run_only = map { $_ => 1 } @ARGV;

@@ -37,7 +37,7 @@ my $client = eval {
 
 is     $@,      '',      "Didn't die";
 ok     $client,          'Got client object';
-isa_ok $client, $cclass, 'Right object, too,';
+ref_ok $client, $cclass, 'Right object, too,';
 
 # This should die despite API not being ready
 eval {

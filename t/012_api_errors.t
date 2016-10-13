@@ -54,7 +54,7 @@ my $client = eval {
 
 is     $@,      '',      "Didn't die";
 ok     $client,          'Got client object';
-isa_ok $client, $cclass, 'Client';
+ref_ok $client, $cclass, 'Client';
 
 # This call should go through and not die, but callback will get
 # the exception instead of actual result
